@@ -22,11 +22,6 @@ socket.on('map', (loadedMap) => {
     map = loadedMap
 })
 
-let players = []
-socket.on('players', (serverPlayers) => {
-    players = serverPlayers
-})
-
 const inputs = {
     'up' :   false,
     'down' : false,
@@ -58,6 +53,11 @@ window.addEventListener('keyup', (e) => {
         inputs['right'] = false
     }
     socket.emit('inputs', inputs)
+})
+
+let players = []
+socket.on('players', (serverPlayers) => {
+    players = serverPlayers
 })
 
 function loop() {
