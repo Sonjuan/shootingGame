@@ -11,50 +11,54 @@ const canvas = canvasEl.getContext('2d')
 
 const TILESIZE = 32
 const TILES_IN_ROW = 8
-let map = [[]]
 
 const socket = io('ws://localhost:5000');
 socket.on('connect', () => {
     console.log('connect');
 });
+
+let map = [[]]
 socket.on('map', (loadedMap) => {
     map = loadedMap
 })
 
+let players = []
+socket.on('players', (serverPlayers) => {
+    players = serverPlayers
+})
+
 const inputs = {
-    'up' : false,
+    'up' :   false,
     'down' : false,
     'left' : false,
-    'right' : false,
+    'right': false,
 }
 
 window.addEventListener('keydown', (e) => {
-    if(e.key === 'w'){
+    if(e.key === 'w') {
         inputs['up'] = true
-    }else if(e.key === 's'){
+    }else if (e.key === 's') {
         inputs['down'] = true
-    }else if(e.key === 'd'){
-        inputs['right'] = true
-    }else if(e.key === 'a'){
+    }else if (e.key === 'a') {
         inputs['left'] = true
+    }else if (e.key === 'd') {
+        inputs['right'] = true
     }
-    socket.emit('input', inputs)
+    socket.emit('inputs', inputs)
 })
 
 window.addEventListener('keyup', (e) => {
-    if(e.key === 'w'){
-        inputs['up'] = false
-    }else if(e.key === 's'){
-        inputs['down'] = false
-    }else if(e.key === 'd'){
+    if(e.key === 'w') {
+        inputs['up']    = false
+    }else if (e.key === 's') {
+        inputs['down']  = false
+    }else if (e.key === 'a') {
+        inputs['left']  = false
+    }else if (e.key === 'd') {
         inputs['right'] = false
-    }else if(e.key === 'a'){
-        inputs['left'] = false
     }
-    socket.emit('input', inputs)
+    socket.emit('inputs', inputs)
 })
-
-
 
 function loop() {
     canvas.clearRect(0, 0, canvas.width, canvas.height)
@@ -79,8 +83,9 @@ function loop() {
         }
     }
 
-    canvas.drawImage(playerImage, 0, 0)
-
+    for(let player of players) {
+        canvas.drawImage(playerImage, player.x, player.y)
+    }
     window.requestAnimationFrame(loop)
 }
 window.requestAnimationFrame(loop)

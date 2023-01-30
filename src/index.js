@@ -6,11 +6,13 @@ const app = express()
 const httpServer = createServer(app)
 const io = new Server(httpServer)
 const loadMap = require('./maploader')
-
+const TICK_RATE = 30
 const SPEED = 5
-const TICk_RATE = 30
+const inputsMap = {}
+let players = []
 
-function tick() {
+function tick () {
+    // console.log(players)
     for(const player of players) {
         const inputs = inputsMap[player.id]
         if(inputs.up) {
@@ -18,36 +20,32 @@ function tick() {
         }else if(inputs.down) {
             player.y += SPEED
         }
-        
+
         if(inputs.left) {
             player.x -= SPEED
-        }else if(inputss.right) {
+        }else if(inputs.right) {
             player.x += SPEED
         }
     }
+    io.emit('players', players)
 }
-
-const players =[]
-const inputsMap = {}
-
 
 async function main() {
     const map2D = await loadMap()
 
     io.on('connection', (socket) => {
-        console.log("user connected", socket.id)    
+        console.log("user connected", socket.id)
         inputsMap[socket.id] = {
-            up: false,
-            down: false,
-            left: false,
-            right : false,
+            'up' : false,
+            'down' : false,
+            'left' : false,
+            'right' : false,
         }
         players.push({
-            id : socket.id,
+            id: socket.id,
             x : 0,
-            y : 0,
+            y: 0,
         })
-
         socket.emit('map', map2D)
         socket.on('inputs', (inputs) => {
             inputsMap[socket.id] = inputs
@@ -55,7 +53,7 @@ async function main() {
     });
     app.use(express.static("public"))
     httpServer.listen(5000)
-    setInterval(tick, 1000 / TICk_RATE)
+    setInterval(tick, 1000 / TICK_RATE)
 }
 
 main()
