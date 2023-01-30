@@ -1,24 +1,60 @@
 const mapImage = new Image()
 mapImage.src = './tmw_desert_spacing.png'
 
+const playerImage = new Image()
+playerImage.src = './santa.png'
+
 const canvasEl = document.getElementById('canvas')
 canvasEl.width = window.innerWidth
 canvasEl.height = window.innerHeight
 const canvas = canvasEl.getContext('2d')
 
-const socket = io('ws://localhost:5000');
+const TILESIZE = 32
+const TILES_IN_ROW = 8
+let map = [[]]
 
+const socket = io('ws://localhost:5000');
 socket.on('connect', () => {
     console.log('connect');
 });
-
-let map = [[]]
 socket.on('map', (loadedMap) => {
     map = loadedMap
 })
 
-const TILESIZE = 32
-const TILES_IN_ROW = 8
+const inputs = {
+    'up' : false,
+    'down' : false,
+    'left' : false,
+    'right' : false,
+}
+
+window.addEventListener('keydown', (e) => {
+    if(e.key === 'w'){
+        inputs['up'] = true
+    }else if(e.key === 's'){
+        inputs['down'] = true
+    }else if(e.key === 'd'){
+        inputs['right'] = true
+    }else if(e.key === 'a'){
+        inputs['left'] = true
+    }
+    socket.emit('input', inputs)
+})
+
+window.addEventListener('keyup', (e) => {
+    if(e.key === 'w'){
+        inputs['up'] = false
+    }else if(e.key === 's'){
+        inputs['down'] = false
+    }else if(e.key === 'd'){
+        inputs['right'] = false
+    }else if(e.key === 'a'){
+        inputs['left'] = false
+    }
+    socket.emit('input', inputs)
+})
+
+
 
 function loop() {
     canvas.clearRect(0, 0, canvas.width, canvas.height)
@@ -42,6 +78,8 @@ function loop() {
             )
         }
     }
+
+    canvas.drawImage(playerImage, 0, 0)
 
     window.requestAnimationFrame(loop)
 }
