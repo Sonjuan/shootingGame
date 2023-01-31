@@ -50,6 +50,10 @@ async function main() {
         socket.on('inputs', (inputs) => {
             inputsMap[socket.id] = inputs
         })
+
+        socket.on('bullets', (angle) => {
+            
+        })
         socket.on('disconnect', () => {
             players = players.filter(player => player.id !== socket.id)
         })

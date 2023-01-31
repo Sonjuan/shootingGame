@@ -55,13 +55,30 @@ window.addEventListener('keyup', (e) => {
     socket.emit('inputs', inputs)
 })
 
+window.addEventListener('click', (e) => {
+    const angle = Math.atan2(
+        e.clientY - canvasEl.height, 
+        e.clientX - canvasEl.width
+    )
+    socket.emit('bullets', angle)
+})
+
 let players = []
 socket.on('players', (serverPlayers) => {
     players = serverPlayers
 })
 
 function loop() {
-    canvas.clearRect(0, 0, canvas.width, canvas.height)
+    canvas.clearRect(0, 0, canvasEl.width, canvasEl.height)
+
+    const myPlayer = players.find((player) => player.id === socket.id)
+    let cameraX = 0
+    let cameraY = 0
+    if(myPlayer) {  
+        cameraX = parseInt(myPlayer.x - canvasEl.width / 2)
+        cameraY = parseInt(myPlayer.y - canvasEl.height/ 2)
+    } 
+    
     for(let row = 0; row < map.length; row++) {
         for(let col = 0; col < map[0].length; col++) {
             const {id} = map[row][col]
@@ -75,8 +92,8 @@ function loop() {
                 imageRow * TILESIZE,
                 TILESIZE,
                 TILESIZE,
-                col * TILESIZE,
-                row * TILESIZE,
+                col * TILESIZE - cameraX,
+                row * TILESIZE - cameraY,
                 TILESIZE,
                 TILESIZE
             )
@@ -84,7 +101,7 @@ function loop() {
     }
 
     for(let player of players) {
-        canvas.drawImage(playerImage, player.x, player.y)
+        canvas.drawImage(playerImage, player.x - cameraX, player.y - cameraY)
     }
     window.requestAnimationFrame(loop)
 }
