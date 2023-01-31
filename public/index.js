@@ -5,9 +5,9 @@ const playerImage = new Image()
 playerImage.src = './santa.png'
 
 const canvasEl = document.getElementById('canvas')
+const canvas = canvasEl.getContext('2d')
 canvasEl.width = window.innerWidth
 canvasEl.height = window.innerHeight
-const canvas = canvasEl.getContext('2d')
 
 const TILESIZE = 32
 const TILES_IN_ROW = 8
@@ -20,6 +20,11 @@ socket.on('connect', () => {
 let map = [[]]
 socket.on('map', (loadedMap) => {
     map = loadedMap
+})
+
+let bullets = []
+socket.on('bullets', (serverBullets) => {
+    bullets = serverBullets
 })
 
 const inputs = {
@@ -57,8 +62,8 @@ window.addEventListener('keyup', (e) => {
 
 window.addEventListener('click', (e) => {
     const angle = Math.atan2(
-        e.clientY - canvasEl.height, 
-        e.clientX - canvasEl.width
+        e.clientY - canvasEl.height / 2, 
+        e.clientX - canvasEl.width  / 2
     )
     socket.emit('bullets', angle)
 })
@@ -75,8 +80,8 @@ function loop() {
     let cameraX = 0
     let cameraY = 0
     if(myPlayer) {  
-        cameraX = parseInt(myPlayer.x - canvasEl.width / 2)
-        cameraY = parseInt(myPlayer.y - canvasEl.height/ 2)
+        cameraX = parseInt(myPlayer.x - canvasEl.width  / 2)
+        cameraY = parseInt(myPlayer.y - canvasEl.height / 2)
     } 
     
     for(let row = 0; row < map.length; row++) {
@@ -100,9 +105,17 @@ function loop() {
         }
     }
 
-    for(let player of players) {
+    for(const player of players) {
         canvas.drawImage(playerImage, player.x - cameraX, player.y - cameraY)
     }
+
+    for(const bullet of bullets) {
+        canvas.fillStyle = '#000000'
+        canvas.beginPath()
+        canvas.arc(bullet.x - cameraX, bullet.y - cameraY, 5, 0, 2 * Math.PI)
+        canvas.fill()
+    }
+
     window.requestAnimationFrame(loop)
 }
 window.requestAnimationFrame(loop)
