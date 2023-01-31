@@ -1,10 +1,10 @@
 {
-  "name": "snowball",
+  "name": "gunfight",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/server.js"
   },
   "keywords": [],
   "author": "",

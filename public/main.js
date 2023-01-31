@@ -2,7 +2,7 @@ const mapImage = new Image()
 mapImage.src = './tmw_desert_spacing.png'
 
 const playerImage = new Image()
-playerImage.src = './santa.png'
+playerImage.src = './player.png'
 
 const canvasEl = document.getElementById('canvas')
 const canvas = canvasEl.getContext('2d')
@@ -13,9 +13,6 @@ const TILESIZE = 32
 const TILES_IN_ROW = 8
 
 const socket = io('ws://localhost:5000');
-socket.on('connect', () => {
-    console.log('connect');
-});
 
 let map = [[]]
 socket.on('map', (loadedMap) => {
