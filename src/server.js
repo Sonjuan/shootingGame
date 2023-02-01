@@ -58,9 +58,7 @@ function tick (delta) {
 
 async function main() {
     const map2D = await loadMap()
-
     io.on('connection', (socket) => {
-        console.log("user connected", socket.id)
         inputsMap[socket.id] = {
             'up'    : false,
             'down'  : false,
@@ -76,7 +74,6 @@ async function main() {
         socket.on('inputs', (inputs) => {
             inputsMap[socket.id] = inputs
         })
-
         socket.on('bullets', (angle) => {
             const player = players.find((player) => player.id === socket.id)
             bullets.push({
@@ -87,8 +84,13 @@ async function main() {
                 playerId : socket.id,
             })
         })
+        socket.broadcast.emit('user-connected', socket.id)
+        console.log("user connected", socket.id)
+
         socket.on('disconnect', () => {
             players = players.filter(player => player.id !== socket.id)
+            socket.broadcast.emit('user-disconnected', socket.id)
+            console.log("user disconnected", socket.id)
         })
     });
     app.use(express.static("public"))
