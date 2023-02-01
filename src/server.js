@@ -84,13 +84,14 @@ async function main() {
                 playerId : socket.id,
             })
         })
-        socket.broadcast.emit('user-connected', socket.id)
-        console.log("user connected", socket.id)
 
-        socket.on('disconnect', () => {
-            players = players.filter(player => player.id !== socket.id)
-            socket.broadcast.emit('user-disconnected', socket.id)
-            console.log("user disconnected", socket.id)
+        socket.on('enter-room', (userId) => {
+            socket.broadcast.emit('user-connected', userId)
+            
+            socket.on('disconnect', () => {
+                players = players.filter(player => player.id !== socket.id)
+                socket.broadcast.emit('user-disconnected', userId)
+            })
         })
     });
     app.use(express.static("public"))

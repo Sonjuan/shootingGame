@@ -15,23 +15,27 @@ const TILES_IN_ROW = 8
 const socket = io('ws://localhost:5000')
 const videoGrid = document.getElementById('video-grid')
 const myVideo = document.createElement('video')
-const myPeer = new Peer(socket.id)
+const myPeer = new Peer()
 
 navigator.mediaDevices.getUserMedia({
     video : true,
     audio : true
 }).then(stream => {
     addVideoStream(myVideo, stream)
-    myPeer.on('call', call => {
+    myPeer.on("call", call => {
         call.answer(stream)
         const video = document.createElement('video')
-        call.on('stream', userVideoStream => {
-            addVideoStream(video, userVideoStream)
+        call.on("stream", (remoteStream) => {
+            addVideoStream(video, remoteStream)
         })
     })
-    socket.on('user-connected', userId => {
-        connectToNewUser(userId, stream)
+    socket.on("user-connected", (userId) => {
+        connectNewUser(userId, stream)
     })
+})
+
+myPeer.on('open', (id) => {
+    socket.emit('enter-room', id)
 })
 
 function addVideoStream(video, stream) {
@@ -42,17 +46,17 @@ function addVideoStream(video, stream) {
     videoGrid.append(video)
 }
 
-function connectToNewUser(userId, stream) {
+function connectNewUser(userId, stream) {
     const call = myPeer.call(userId, stream)
     const video = document.createElement('video')
     call.on('stream', userVideoStream => {
         addVideoStream(video, userVideoStream)
     })
-
-    call.on('close', () => {
+    myPeer.on('close', () => {
         video.remove()
     })
 }
+
 
 let map = [[]]
 socket.on('map', (loadedMap) => {
