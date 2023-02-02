@@ -52,8 +52,10 @@ function connectNewUser(userId, stream) {
     call.on('stream', userVideoStream => {
         addVideoStream(video, userVideoStream)
     })
-    myPeer.on('close', () => {
-        video.remove()
+    socket.on('user-disconnected', (targetId) => {
+        if(targetId === userId) {
+            video.parentElement.removeChild(video)
+        }
     })
 }
 
