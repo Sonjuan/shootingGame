@@ -17,6 +17,9 @@ const videoGrid = document.getElementById('video-grid')
 const myVideo = document.createElement('video')
 const myPeer = new Peer()
 
+const muteButton = document.getElementById("mute")
+let isPlaying = true
+
 navigator.mediaDevices.getUserMedia({
     video : true,
     audio : true
@@ -31,6 +34,16 @@ navigator.mediaDevices.getUserMedia({
     })
     socket.on("user-connected", (userId) => {
         connectNewUser(userId, stream)
+    })
+    muteButton.addEventListener("click", () => {
+        if(isPlaying) {
+            stream.getAudioTracks()[0].enabled = false
+            muteButton.innerText = "unmute"
+        } else {
+            stream.getAudioTracks()[0].enabled = true
+            muteButton.innerText = "mute"
+        }
+        isPlaying = !isPlaying
     })
 })
 

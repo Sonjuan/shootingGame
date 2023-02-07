@@ -19,6 +19,14 @@
                 height : 100%;
                 object-fit:cover;
             }
+            #mute {
+                position: absolute;
+                width: 80px;
+                height: 30px;
+                top: 5px;
+                left: 5px;
+                user-select: none;
+            }
         </style>
         <script src="/socket.io/socket.io.js"></script>
         <script type="module" src="/main.js"></script>
@@ -26,6 +34,7 @@
     </head>
     <body>
         <canvas id="canvas"></canvas>
+        <button id="mute">mute</button>
         <div id="video-grid"></div>
     </body>
 </html>
